@@ -506,24 +506,6 @@ pytest tests/
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
-
-- **OpenCV Team** for the exceptional computer vision library
-- **TensorFlow/Keras Community** for the deep learning framework
-- **MobileNetV2 Authors** for the efficient neural network architecture
-- **Kaggle Community** for providing high-quality datasets
-- **All Contributors** who have helped improve this project
-
-## 📞 Support & Contact
-
-**Project Maintainer**: Your Name - [your.email@example.com](mailto:your.email@example.com)
-
-**Project Link**: [https://github.com/yourusername/face-mask-detector](https://github.com/yourusername/face-mask-detector)
-
-**Issue Tracker**: [https://github.com/yourusername/face-mask-detector/issues](https://github.com/yourusername/face-mask-detector/issues)
-
-**Discussion Forum**: [https://github.com/yourusername/face-mask-detector/discussions](https://github.com/yourusername/face-mask-detector/discussions)
-
 ---
 
 <div align="center">
