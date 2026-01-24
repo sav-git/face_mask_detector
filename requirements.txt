@@ -6,20 +6,14 @@ scikit-learn>=1.0.0
 matplotlib>=3.5.0
 imutils>=0.5.4
 
-# Веб-приложение
-flask>=2.0.0
-flask-socketio>=5.1.0
-flask-cors>=3.0.10
-eventlet>=0.30.0  # для WebSocket
+# Разработка и тестирование
+pytest>=7.0.0
+black>=22.0.0
+flake8>=4.0.0
+mypy>=0.950
+pytest-cov>=3.0.0
 
 # Утилиты
-jupyter>=1.0.0
-joblib>=1.1.0
 pillow>=9.0.0
 python-dotenv>=0.19.0
-
-# Для обработки видео
-moviepy>=1.0.3  # опционально
-
-# Документация
-sphinx>=4.0.0  # опционально
+tqdm>=4.64.0
