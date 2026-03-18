@@ -15,7 +15,6 @@ import numpy as np
 import json
 import os
 
-
 class MaskDetectionModel:
     
     def __init__(self, input_shape=(224, 224, 3), num_classes=2):
@@ -83,9 +82,9 @@ class MaskDetectionModel:
         
         return self.model
     
-    def create_callbacks(self, model_path="../models/mask_detector.model"):
+    def create_callbacks(self, model_path="../models/mask_detector.keras"):
         checkpoint = ModelCheckpoint(
-            model_path,
+            "../models/mask_detector.keras",
             monitor="val_accuracy",
             verbose=1,
             save_best_only=True,
@@ -174,7 +173,7 @@ class MaskDetectionModel:
                 verbose=1
             )
         
-        self.model.save("../models/mask_detector_final.h5")
+        self.model.save("../models/mask_detector_final.keras")
         self.save_training_history(history)
         self.plot_training_history(history)
         
@@ -260,17 +259,32 @@ class MaskDetectionModel:
 
 def main():
     import joblib
-    from training_utils import DatasetPreparer
+    # from training_utils import DatasetPreparer
+    from training_utils import load_split_data
+
+
+    train_path = "../dataset_yolo_converted/train"
+    val_path = "../dataset_yolo_converted/val"
+    test_path = "../dataset_yolo_converted/test"
+
+    print("Загрузка train...")
+    trainX, trainY, label_encoder = load_split_data(train_path)
+    print("Загрузка val...")
+    valX, valY, _ = load_split_data(val_path)  # используем тот же энкодер
+    print("Загрузка test...")
+    testX, testY, _ = load_split_data(test_path)
+
+    print(f"Train: {trainX.shape}, Val: {valX.shape}, Test: {testX.shape}")
     
-    print("[=== ШАГ 1: ПОДГОТОВКА ДАННЫХ ===]")
-    preparer = DatasetPreparer("../dataset")
-    data, labels = preparer.load_images()
-    data = preparer.normalize_data(data)
-    encoded_labels = preparer.encode_labels(labels)
+    # print("[=== ШАГ 1: ПОДГОТОВКА ДАННЫХ ===]")
+    # preparer = DatasetPreparer("../dataset")
+    # data, labels = preparer.load_images()
+    # data = preparer.normalize_data(data)
+    # encoded_labels = preparer.encode_labels(labels)
     
-    trainX, valX, testX, trainY, valY, testY = preparer.split_dataset(
-        data, encoded_labels, test_size=0.15, val_size=0.15
-    )
+    # trainX, valX, testX, trainY, valY, testY = preparer.split_dataset(
+    #     data, encoded_labels, test_size=0.15, val_size=0.15
+    # )
     
     print("\n[=== ШАГ 2: СОЗДАНИЕ МОДЕЛИ ===]")
     model_builder = MaskDetectionModel()
@@ -301,7 +315,7 @@ def main():
     metrics = model_builder.evaluate_model(testX, testY)
     
     print("\n[=== ШАГ 6: СОХРАНЕНИЕ ===]")
-    model_builder.model.save("../models/mask_detector_final.h5")
+    model_builder.model.save("../models/mask_detector_final.keras")
     
     converter = tf.lite.TFLiteConverter.from_keras_model(model_builder.model)
     tflite_model = converter.convert()
@@ -311,7 +325,7 @@ def main():
     
     print("[INFO] Обучение завершено успешно!")
     print(f"  Final accuracy: {metrics.get('accuracy', 0):.4f}")
-    print(f"  Model saved: ../models/mask_detector_final.h5")
+    print(f"  Model saved: ../models/mask_detector_final.keras")
     print(f"  TFLite model saved: ../models/mask_detector.tflite")
 
 

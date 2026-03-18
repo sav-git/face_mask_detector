@@ -50,12 +50,6 @@ class FaceMaskDetector:
             
             model = load_model(model_path, compile=False)
             
-            model.compile(
-                optimizer='adam',
-                loss='categorical_crossentropy',
-                metrics=['accuracy']
-            )
-            
             test_input = np.random.randn(1, *self.input_size, 3).astype(np.float32)
             _ = model.predict(test_input, verbose=0)
             
@@ -234,7 +228,7 @@ class FaceMaskDetector:
 _detector_instance = None
 
 def get_detector(
-    model_path: str = "../models/mask_detector.model",
+    model_path: str = "../models/mask_detector.keras",
     **kwargs
 ) -> FaceMaskDetector:
     global _detector_instance

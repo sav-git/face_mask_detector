@@ -9,10 +9,9 @@ from pathlib import Path
 from typing import List, Dict, Tuple
 import numpy as np
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
 from detector import FaceMaskDetector, FaceDetector, Visualizer
 from detector.utils import download_face_detector_models
+
 
 
 class ImageTester:
@@ -179,8 +178,8 @@ def main():
                        help='Путь к изображению или папке с изображениями')
     parser.add_argument('-o', '--output', default='output',
                        help='Папка для сохранения результатов (по умолчанию: output)')
-    parser.add_argument('-m', '--model', default='models/mask_detector.model',
-                       help='Путь к модели детектора масок (по умолчанию: models/mask_detector.model)')
+    parser.add_argument('-m', '--model', default='models/mask_detector.keras',
+                       help='Путь к модели детектора масок (по умолчанию: models/mask_detector.keras)')
     
     parser.add_argument('-p', '--prototxt', default='face_detector/deploy.prototxt',
                        help='Путь к prototxt файлу детектора лиц')

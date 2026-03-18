@@ -8,8 +8,6 @@ from datetime import datetime
 from pathlib import Path
 import numpy as np
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
 from detector import FaceMaskDetector, FaceDetector, Visualizer
 from detector.utils import download_face_detector_models
 
@@ -211,23 +209,23 @@ class CameraDetector:
         print("[INFO] Ресурсы освобождены")
 
 
-def create_control_window(detector: CameraDetector):
-    cv2.namedWindow("Controls", cv2.WINDOW_NORMAL)
-    cv2.resizeWindow("Controls", 400, 400)
+# def create_control_window(detector: CameraDetector):
+#     cv2.namedWindow("Controls", cv2.WINDOW_NORMAL)
+#     cv2.resizeWindow("Controls", 400, 400)
     
-    cv2.createTrackbar("Face Confidence", "Controls", 
-                      int(detector.settings['face_confidence'] * 100), 100,
-                      lambda x: detector.face_detector.confidence_threshold)
+#     cv2.createTrackbar("Face Confidence", "Controls", 
+#                       int(detector.settings['face_confidence'] * 100), 100,
+#                       lambda x: detector.face_detector.confidence_threshold)
     
-    cv2.createTrackbar("Mask Confidence", "Controls",
-                      int(detector.settings['mask_confidence'] * 100), 100,
-                      lambda x: detector.mask_detector.update_threshold(x / 100.0))
+#     cv2.createTrackbar("Mask Confidence", "Controls",
+#                       int(detector.settings['mask_confidence'] * 100), 100,
+#                       lambda x: detector.mask_detector.update_threshold(x / 100.0))
     
-    cv2.createTrackbar("Face Detection", "Controls", 1, 1,
-                      lambda x: setattr(detector.settings, 'face_detection_enabled', bool(x)))
+#     cv2.createTrackbar("Face Detection", "Controls", 1, 1,
+#                       lambda x: setattr(detector.settings, 'face_detection_enabled', bool(x)))
     
-    cv2.createTrackbar("Mask Detection", "Controls", 1, 1,
-                      lambda x: setattr(detector.settings, 'mask_detection_enabled', bool(x)))
+#     cv2.createTrackbar("Mask Detection", "Controls", 1, 1,
+#                       lambda x: setattr(detector.settings, 'mask_detection_enabled', bool(x)))
 
 
 def main():
@@ -248,7 +246,7 @@ def main():
     
     parser.add_argument('-c', '--camera', type=int, default=0,
                        help='ID камеры (по умолчанию: 0)')
-    parser.add_argument('-m', '--model', default='models/mask_detector.model',
+    parser.add_argument('-m', '--model', default='models/mask_detector.keras',
                        help='Путь к модели детектора масок')
     parser.add_argument('-r', '--resolution', default='640x480',
                        help='Разрешение камеры (по умолчанию: 640x480)')
@@ -278,8 +276,8 @@ def main():
     if not detector.initialize_camera(args.camera):
         sys.exit(1)
     
-    if not args.no_controls:
-        create_control_window(detector)
+    # if not args.no_controls:
+    #     create_control_window(detector)
     
     print("\n[INFO] Запуск основного цикла. Нажмите 'q' для выхода.")
     print("[INFO] См. справку по управлению выше.\n")

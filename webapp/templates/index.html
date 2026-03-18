@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Face Mask Detector</title>
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>Face Mask Detector</h1>
+    <img src="{{ url_for('video_feed') }}" width="640" height="480">
+    <div id="stats"></div>
+    <script>
+        var socket = io();
+        socket.on('stats_update', function(stats) {
+            document.getElementById('stats').innerHTML = 
+                'FPS: ' + stats.fps + 
+                ', Faces: ' + stats.total_faces +
+                ', With mask: ' + stats.with_mask;
+        });
+    </script>
+</body>
+</html>

@@ -9,8 +9,6 @@ import numpy as np
 from datetime import datetime
 from pathlib import Path
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 from flask import Flask, render_template, Response, jsonify, request, send_from_directory
 from flask_socketio import SocketIO, emit
 from flask_cors import CORS
@@ -21,10 +19,10 @@ from detector.utils import download_face_detector_models
 app = Flask(__name__, 
            template_folder='templates',
            static_folder='static')
-app.config['SECRET_KEY'] = 'your-secret-key-here'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', os.urandom(24))
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload
 
-CORS(app)
+CORS(app, origins=["http://localhost:5000", "http://127.0.0.1:5000"])
 
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 
@@ -36,6 +34,8 @@ camera_thread = None
 camera_running = False
 current_frame = None
 frame_lock = threading.Lock()
+stats_lock = threading.Lock()
+camera_stop_event = threading.Event()
 
 stats = {
     'total_faces': 0,
@@ -64,9 +64,9 @@ def initialize_models():
     print("[INFO] Инициализация моделей...")
     
     try:
-        model_path = "models/mask_detector.model"
+        model_path = "models/mask_detector.keras"
         if not os.path.exists(model_path):
-            model_path = "../models/mask_detector.model"
+            model_path = "../models/mask_detector.keras"
         
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"Модель не найдена: {model_path}")
@@ -125,7 +125,7 @@ def camera_loop():
     fps_start_time = time.time()
     frame_count = 0
     
-    while camera_running and camera is not None:
+    while not camera_stop_event.is_set() and camera is not None:
         ret, frame = camera.read()
         if not ret:
             print("[ERROR] Не удалось получить кадр с камеры")
@@ -222,7 +222,8 @@ def video_feed():
 
 @app.route('/api/stats')
 def get_stats():
-    return jsonify(stats)
+    with stats_lock:
+        return jsonify(stats)
 
 
 @app.route('/api/settings')
@@ -249,6 +250,9 @@ def update_settings():
     
     return jsonify({'success': True, 'settings': settings})
 
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/api/detect', methods=['POST'])
 def detect_image():
@@ -258,6 +262,9 @@ def detect_image():
     file = request.files['image']
     if file.filename == '':
         return jsonify({'error': 'No image selected'}), 400
+
+    if file.filename == '' or not allowed_file(file.filename):
+        return jsonify({'error': 'Invalid file type'}), 400
     
     try:
         img_bytes = file.read()
@@ -299,10 +306,13 @@ def start_camera_api():
 def stop_camera_api():
     global camera_running, camera
     
-    camera_running = False
+    camera_stop_event.set()
+    if camera_thread is not None:
+        camera_thread.join(timeout=2.0)
     if camera is not None:
         camera.release()
         camera = None
+    camera_running = False
     
     return jsonify({'success': True})
 
