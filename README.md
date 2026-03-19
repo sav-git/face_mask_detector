@@ -5,35 +5,35 @@
 [![OpenCV](https://img.shields.io/badge/OpenCV-4.6%2B-green)](https://opencv.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A practical, production-ready computer vision system for real-time face mask detection. This project demonstrates a clean implementation of a two-stage detection pipeline using OpenCV's face detector and a custom MobileNetV2 classifier, focused on inference efficiency and modular design.
+A **production‑ready computer vision system** for real‑time face mask detection.  
+The project combines an OpenCV DNN‑based face detector with a fine‑tuned **MobileNetV2** classifier (TensorFlow/Keras).  
+It covers the full pipeline: data preparation (converting YOLO format to a classification dataset), training with **fine‑tuning** and **mixed precision**, inference via webcam or static images, and a web interface.
 
-## ✨ Features
+## ✨ Key Features
 
 ### Core Capabilities
-- **🎭 Real-time Detection** - Live webcam processing with interactive controls
-- **📸 Image Processing** - Batch processing of images and directories
-- **🧠 Modular Architecture** - Clean separation of face detection, mask classification, and visualization
-- **⚡ Performance Optimized** - Configurable confidence thresholds and GPU support
-- **📊 Live Statistics** - Real-time FPS, face counts, and mask percentage tracking
-
-### Processing Modes
-- **Real-time Video** - Process webcam feed with interactive keyboard controls
-- **Static Images** - Process single images or entire directories
-- **Batch Processing** - Automated processing with results export
+ **🎯 High Accuracy** – **91% accuracy**, **F1‑score 0.89** on a balanced test set of 4784 images (from [my resume](Artem_Savelev_Resume.pdf))
+- **📷 Multiple Modes**:
+  - **Real‑time webcam** detection with interactive controls
+  - **Image/directory** batch processing
+  - **Web application** (Flask + Socket.IO) with live video stream
+- **🧠 Full Training Pipeline** – YOLO‑to‑classification conversion, augmentation, fine‑tuning, export to `.keras` and `.tflite`
+- **⚡ Performance Optimized** – mixed‑precision training, GPU support, adjustable confidence thresholds
+- **📊 Live Statistics** – FPS, face count, mask percentage, and result saving
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - Python 3.8 or higher
 - Webcam (for real-time mode)
-- 4GB+ RAM (8GB+ recommended for optimal performance)
+- 4+ GB RAM (8GB+ recommended for optimal performance)
 
 ### Installation
 
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/sartemv-of/Face_Mask_Detector.git
-cd Face_Mask_Detector
+git clone https://github.com/sav-git/face_mask_detector.git
+cd face_mask_detector
 ```
 
 2. **Create and activate virtual environment (recommended):**
@@ -56,11 +56,48 @@ python -c "from detector.utils import download_face_detector_models; download_fa
 ```
 
 5. **Download mask classification model:**
-Place the pre-trained `mask_detector.model` file in the `models/` directory.
+Place the pre-trained `mask_detector.keras` file in the `models/` directory.
 ```bash
 # Example using wget:
-wget -P models/ https://github.com/sartemv-of/Face_Mask_Detector/releases/download/v1.0.0/mask_detector.model
+wget -P models/ https://github.com/sav-git/face_mask_detector/models/mask_detector.keras
 ```
+### Train model
+
+1. **Prepare your data**
+   Place images and YOLO annotation files in the following structure:
+   ```
+   data/raw/
+   ├── _training_set/   # images + .txt files for training
+   ├── _validation_set/ # for validation
+   └── _test_set/       # for testing
+   ```
+   Then convert the dataset:
+   ```bash
+   python prepare_from_yolo.py
+   ```
+
+2. **Train the model** (or use a pre‑trained one)
+   ```bash
+   python training/train_model.py
+   ```
+   The trained model will be saved to `models/mask_detector.keras`.
+
+3. **Run detection**
+   - **Webcam**  
+     ```bash
+     python test_camera.py
+     ```
+   - **Single image / folder**  
+     ```bash
+     python test_image.py -i examples/example.jpg -o results/
+     ```
+   - **Web app**  
+     ```bash
+     cd webapp
+     python app.py
+     ```
+     Open your browser at `http://localhost:5000`
+
 
 ## 📁 Project Structure
 
@@ -70,14 +107,19 @@ face-mask-detector/
 │   ├── __init__.py           # Package exports and version
 │   ├── mask_detector.py      # Main detection class with batch processing
 │   └── utils.py              # FaceDetector, Visualizer, utilities
+├── training/                 # Training scripts
+│   ├── train_model.py
+│   └── training_utils.py
+├── webapp/                   # Flask web application
+│   ├── app.py
+│   └── templates/index.html
 ├── face_detector/            # Pre-trained face detection models (downloaded)
-│   ├── deploy.prototxt       # Network configuration
-│   └── res10_300x300_ssd_iter_140000.caffemodel
 ├── models/                   # Trained mask detection models (user-provided)
 ├── examples/                 # Sample images and configurations
 ├── recordings/               # Video recordings and screenshots
-├── test_image.py             # Image testing script with CLI
-├── test_camera.py            # Real-time camera testing
+├── test/
+│   ├── test_image.py         # Image testing script with CLI
+│   └── test_camera.py        # Real-time camera testing 
 ├── requirements.txt          # Python dependencies
 ├── .gitignore                # Git ignore rules
 └── README.md                 # This documentation
@@ -380,5 +422,3 @@ Stay safe and wear your mask properly! 😷
 *Made with ❤️ for the developer community*
 
 </div>
-
----
