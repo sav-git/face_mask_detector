@@ -1,11 +1,40 @@
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Python cache
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Data and models
+data/
+!data/raw/*.rar
+models/*.h5
+models/*.tflite
+models/*.pkl
+face_detector/
+examples/
+logs/
+recordings/
+webapp/static/screenshots/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+
+# Miscellaneous
+*.log
 *.py[cod]
 *$py.class
 *.so
 .Python
-env/
-venv/
-*.env
-dataset/
-models/
-.DS_Store

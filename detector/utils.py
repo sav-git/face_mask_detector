@@ -268,17 +268,6 @@ def download_face_detector_models(output_dir: str = "face_detector"):
         except Exception as e:
             print(f"[ERROR] Не удалось скачать модель: {e}")
 
-
-def preprocess_image(image: np.ndarray, target_size: Tuple[int, int] = (224, 224)) -> np.ndarray:
-    rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    
-    resized_image = cv2.resize(rgb_image, target_size)
-    
-    normalized_image = resized_image.astype(np.float32) / 255.0
-    
-    return normalized_image
-
-
 def calculate_iou(box1: Tuple[int, int, int, int], box2: Tuple[int, int, int, int]) -> float:
     x1_min, y1_min = box1[0], box1[1]
     x1_max, y1_max = box1[0] + box1[2], box1[1] + box1[3]
@@ -302,16 +291,3 @@ def calculate_iou(box1: Tuple[int, int, int, int], box2: Tuple[int, int, int, in
     iou = inter_area / union_area if union_area > 0 else 0
     
     return iou
-
-def load_face_detector(prototxt_path: str = None, model_path: str = None) -> FaceDetector:
-    if prototxt_path is None:
-        prototxt_path = "face_detector/deploy.prototxt"
-    
-    if model_path is None:
-        model_path = "face_detector/res10_300x300_ssd_iter_140000.caffemodel"
-    
-    return FaceDetector(prototxt_path, model_path)
-
-
-def create_visualizer() -> Visualizer:
-    return Visualizer()

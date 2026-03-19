@@ -33,21 +33,19 @@ def check_python_version():
 
 def create_project_structure():
     print("[2/8] Создание структуры папок...")
-    
     directories = [
-        'dataset',
-        'dataset/with_mask',
-        'dataset/without_mask',
+        'data/raw',
+        'data/processed',
         'models',
         'logs',
         'examples',
         'face_detector',
-        'webapp/static',
         'webapp/static/screenshots',
         'webapp/templates',
-        'recordings'
+        'recordings',
+        'training',
+        'scripts'
     ]
-    
     for directory in directories:
         os.makedirs(directory, exist_ok=True)
         print(f"  📁 Создана папка: {directory}")
@@ -174,26 +172,26 @@ def create_launch_scripts():
     print("[7/8] Создание скриптов запуска...")
     
     scripts = {
-        "run_training.bat": """
+    "run_training.bat": """
 @echo off
 echo Запуск обучения модели...
-python training/02_train_model.py
+python training/train.py
 pause
 """,
-        "run_training.sh": """#!/bin/bash
+    "run_training.sh": """#!/bin/bash
 echo "Запуск обучения модели..."
-python training/02_train_model.py
+python training/train.py
 read -p "Нажмите Enter для продолжения..."
 """,
         "run_webcam.bat": """
 @echo off
 echo Запуск детекции с веб-камеры...
-python test_camera.py
+python test/test_camera.py
 pause
 """,
         "run_webcam.sh": """#!/bin/bash
 echo "Запуск детекции с веб-камеры..."
-python test_camera.py
+python test/test_camera.py
 read -p "Нажмите Enter для продолжения..."
 """,
         "run_webapp.bat": """
@@ -246,9 +244,7 @@ def print_final_instructions():
    • Поместите изображения без масок в: dataset/without_mask/
 
 2. 🧠 ОБУЧЕНИЕ МОДЕЛИ
-   • Запустите обучение: python training/02_train_model.py
-   • Или используйте скрипт: run_training.bat (Windows)
-                             run_training.sh (Linux/Mac)
+   • Запустите обучение: python training/train_model.py
 
 3. 🎬 ТЕСТИРОВАНИЕ
    • С веб-камеры: python test_camera.py
@@ -259,7 +255,7 @@ def print_final_instructions():
    • Откройте браузер и перейдите по адресу: http://localhost:5000
 
 📁 СТРУКТУРА ПРОЕКТА:
-   dataset/          - данные для обучения
+   data/             - данные для обучения
    models/           - обученные модели
    detector/         - модуль детекции
    training/         - скрипты обучения
@@ -270,7 +266,7 @@ def print_final_instructions():
 📞 ПОДДЕРЖКА:
    • Проблемы с установкой: проверьте версию Python (>=3.7)
    • Проблемы с камерой: проверьте подключение веб-камеры
-   • Проблемы с моделями: запустите setup.py еще раз
+   • Проблемы с моделями: запустите configure.py еще раз
 
 🚀 Удачи в использовании Face Mask Detection System!
     """

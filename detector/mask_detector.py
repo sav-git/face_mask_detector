@@ -224,16 +224,3 @@ class FaceMaskDetector:
         
         avg_time = np.mean(times) * 1000
         print(f"[INFO] Прогрев завершен. Среднее время инференса: {avg_time:.2f} мс")
-
-_detector_instance = None
-
-def get_detector(
-    model_path: str = "../models/mask_detector.keras",
-    **kwargs
-) -> FaceMaskDetector:
-    global _detector_instance
-    
-    if _detector_instance is None:
-        _detector_instance = FaceMaskDetector(model_path, **kwargs)
-    
-    return _detector_instance

@@ -16,6 +16,8 @@ from flask_cors import CORS
 from detector import FaceMaskDetector, FaceDetector, Visualizer
 from detector.utils import download_face_detector_models
 
+BASE_DIR = Path(__file__).parent.absolute()
+
 app = Flask(__name__, 
            template_folder='templates',
            static_folder='static')
@@ -35,6 +37,7 @@ camera_running = False
 current_frame = None
 frame_lock = threading.Lock()
 stats_lock = threading.Lock()
+settings_lock = threading.Lock()
 camera_stop_event = threading.Event()
 
 stats = {
@@ -64,17 +67,17 @@ def initialize_models():
     print("[INFO] Инициализация моделей...")
     
     try:
-        model_path = "models/mask_detector.keras"
+        model_path = os.path.join(BASE_DIR, "models", "mask_detector.keras")
         if not os.path.exists(model_path):
-            model_path = "../models/mask_detector.keras"
+            model_path = os.path.join(BASE_DIR, "models", "mask_detector.keras")
         
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"Модель не найдена: {model_path}")
         
         detector = FaceMaskDetector(model_path, confidence_thresh=settings['mask_confidence'])
         
-        prototxt_path = "face_detector/deploy.prototxt"
-        caffemodel_path = "face_detector/res10_300x300_ssd_iter_140000.caffemodel"
+        prototxt_path = os.path.join(BASE_DIR, "face_detector", "deploy.prototxt")
+        caffemodel_path = os.path.join(BASE_DIR, "face_detector", "res10_300x300_ssd_iter_140000.caffemodel")
         
         if not os.path.exists(prototxt_path):
             print("[WARNING] Модели детектора лиц не найдены. Скачивание...")
@@ -141,7 +144,8 @@ def camera_loop():
         
         frame_count += 1
         if time.time() - fps_start_time >= 1.0:
-            stats['fps'] = frame_count
+            with stats_lock:
+                stats['fps'] = frame_count
             frame_count = 0
             fps_start_time = time.time()
             
@@ -258,11 +262,8 @@ def allowed_file(filename):
 def detect_image():
     if 'image' not in request.files:
         return jsonify({'error': 'No image provided'}), 400
-    
-    file = request.files['image']
-    if file.filename == '':
-        return jsonify({'error': 'No image selected'}), 400
 
+    file = request.files['image']
     if file.filename == '' or not allowed_file(file.filename):
         return jsonify({'error': 'Invalid file type'}), 400
     

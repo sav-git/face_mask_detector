@@ -8,43 +8,27 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 def create_augmentor():
     return ImageDataGenerator(
-        rotation_range=20,
-        width_shift_range=0.2,
-        height_shift_range=0.2,
-        shear_range=0.15,
-        zoom_range=0.15,
+        rotation_range=30,
+        width_shift_range=0.3,
+        height_shift_range=0.3,
+        shear_range=0.2,
+        zoom_range=0.2,
         horizontal_flip=True,
         vertical_flip=False,
-        brightness_range=[0.7, 1.3],
+        brightness_range=[0.5, 1.5],
         channel_shift_range=20.0,
         fill_mode='nearest'
     )
 
-
-def calculate_class_weights(labels):
-    from sklearn.utils.class_weight import compute_class_weight
-    
-    integer_labels = np.argmax(labels, axis=1)
-    
-    classes = np.unique(integer_labels)
-    weights = compute_class_weight(
-        class_weight='balanced',
-        classes=classes,
-        y=integer_labels
+def create_augmentor_fast():
+    """Упрощенная аугментация для быстрого обучения"""
+    return ImageDataGenerator(
+        rotation_range=15,
+        width_shift_range=0.1,
+        height_shift_range=0.1,
+        horizontal_flip=True,
+        fill_mode='nearest'
     )
-    
-    return dict(zip(classes, weights))
-
-
-def learning_rate_schedule(epoch, lr):
-    if epoch < 10:
-        return lr
-    elif epoch < 20:
-        return lr * 0.5
-    elif epoch < 30:
-        return lr * 0.2
-    else:
-        return lr * 0.1
 
 def load_split_data(split_path, target_size=(224,224)):
     """
